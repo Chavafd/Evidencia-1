@@ -1,9 +1,11 @@
 # Evidencia-1
 
 Sistema de Administración de Citas Médicas
+
 Este programa simula un sistema de administración de citas para un consultorio médico. Permite dar de alta doctores y pacientes, crear citas y asignarlas a doctores y pacientes, y tiene un sistema de control de acceso para administradores.
 
 Instalación y configuración
+
 Asegúrate de tener Java 11 y Git instalados en tu sistema.
 Clona este repositorio en tu sistema local usando Git.
 Abre el proyecto en tu IDE preferido (recomendamos IntelliJ IDEA).
