@@ -15,8 +15,10 @@ public class Clinica {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
-        System.out.println("Clinica XXXXX");
-        System.out.println("Ingrese ID y contraseña");
+        System.out.println("Administración de Pasientes");
+        System.out.println("CODIGO");
+        System.out.println("NOMBRES COMPLETOS");
+        System.out.println("CEDULA (ID)");
         String ID_admin = scanner.nextLine();
         String password = scanner.nextLine();
 
