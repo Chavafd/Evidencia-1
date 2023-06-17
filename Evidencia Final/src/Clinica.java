@@ -1,16 +1,24 @@
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.io.PrintWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
 
 public class Clinica {
     private static List<Doctor> doctores = new ArrayList<>();
     private static List<Paciente> pacientes = new ArrayList<>();
+    private static List<Cita> citas = new ArrayList<>();
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
-        System.out.println("Clinica XXXXX");
-        System.out.println("Ingrese ID y contraseña");
+        System.out.println("Administración de Pasientes");
+        System.out.println("CODIGO");
+        System.out.println("NOMBRES COMPLETOS");
+        System.out.println("CEDULA (ID)");
         String ID_admin = scanner.nextLine();
         String password = scanner.nextLine();
 
@@ -43,10 +51,27 @@ public class Clinica {
                         pacientes.add(new Paciente(IDP, nombreP));
                         break;
                     case 3:
-                        // Nueva posible funcion de validacion
+                        System.out.println("Introduzca ID de la cita");
+                        String IDC = scanner.nextLine();
+                        System.out.println("Introduzca fecha y hora de la cita (formato: yyyy-MM-dd HH:mm)");
+                        String fechaHoraStr = scanner.nextLine();
+                        LocalDateTime fechaHora = LocalDateTime.parse(fechaHoraStr, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+                        System.out.println("Introduzca motivo de la cita");
+                        String motivo = scanner.nextLine();
+                        System.out.println("Introduzca ID del doctor");
+                        String doctorID = scanner.nextLine();
+                        Doctor doctor = doctores.stream().filter(d -> d.getId().equals(doctorID)).findFirst().orElse(null);
+                        System.out.println("Introduzca ID del paciente");
+                        String pacienteID = scanner.nextLine();
+                        Paciente paciente = pacientes.stream().filter(p -> p.getId().equals(pacienteID)).findFirst().orElse(null);
+                        if (doctor != null && paciente != null) {
+                            citas.add(new Cita(IDC, fechaHora, motivo, doctor, paciente));
+                        } else {
+                            System.out.println("Error: doctor o paciente no encontrado");
+                        }
                         break;
                     case 4:
-                        // Nueva posible funcion de validacion
+                        // Aquí deberías implementar la funcionalidad para verificar una cita
                         break;
                     case 5:
                         System.out.println("Salir");
@@ -58,4 +83,92 @@ public class Clinica {
             }
         }
     }
+    public static void guardarDoctores() {
+        try {
+            PrintWriter writer = new PrintWriter(new File("db/doctores.txt"));
+            for (Doctor doctor : doctores) {
+                writer.println(doctor.getId() + "," + doctor.getNombreCompleto() + "," + doctor.getEspecialidad());
+            }
+            writer.close();
+        } catch (FileNotFoundException e) {
+            System.out.println("Error al guardar los doctores: " + e.getMessage());
+        }
+    }
+
+    public static void cargarDoctores() {
+        try {
+            Scanner scanner = new Scanner(new File("db/doctores.txt"));
+            while (scanner.hasNextLine()) {
+                String[] partes = scanner.nextLine().split(",");
+                doctores.add(new Doctor(partes[0], partes[1], partes[2]));
+            }
+            scanner.close();
+        } catch (FileNotFoundException e) {
+            System.out.println("Error al cargar los doctores: " + e.getMessage());
+        }
+    }
+    public static void guardarPacientes() {
+        try {
+            PrintWriter writer = new PrintWriter(new File("db/pacientes.txt"));
+            for (Paciente paciente : pacientes) {
+                writer.println(paciente.getId() + "," + paciente.getNombreCompleto());
+            }
+            writer.close();
+        } catch (FileNotFoundException e) {
+            System.out.println("Error al guardar los pacientes: " + e.getMessage());
+        }
+    }
+
+    public static void cargarPacientes() {
+        try {
+            Scanner scanner = new Scanner(new File("db/pacientes.txt"));
+            while (scanner.hasNextLine()) {
+                String[] partes = scanner.nextLine().split(",");
+                pacientes.add(new Paciente(partes[0], partes[1]));
+            }
+            scanner.close();
+        } catch (FileNotFoundException e) {
+            System.out.println("Error al cargar los pacientes: " + e.getMessage());
+        }
+    }
+
+    public static void guardarCitas() {
+        try {
+            PrintWriter writer = new PrintWriter(new File("db/citas.txt"));
+            for (Cita cita : citas) {
+                writer.println(cita.getId() + "," + cita.getFechaHora() + "," + cita.getMotivo() + "," + cita.getDoctor().getId() + "," + cita.getPaciente().getId());
+            }
+            writer.close();
+        } catch (FileNotFoundException e) {
+            System.out.println("Error al guardar las citas: " + e.getMessage());
+        }
+    }
+
+    public static void cargarCitas() {
+        try {
+            Scanner scanner = new Scanner(new File("db/citas.txt"));
+            while (scanner.hasNextLine()) {
+                String[] partes = scanner.nextLine().split(",");
+                String idCita = partes[0];
+                LocalDateTime fechaHora = LocalDateTime.parse(partes[1], DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+                String motivo = partes[2];
+                String idDoctor = partes[3];
+                String idPaciente = partes[4];
+
+                Doctor doctor = doctores.stream().filter(d -> d.getId().equals(idDoctor)).findFirst().orElse(null);
+                Paciente paciente = pacientes.stream().filter(p -> p.getId().equals(idPaciente)).findFirst().orElse(null);
+
+                if (doctor != null && paciente != null) {
+                    citas.add(new Cita(idCita, fechaHora, motivo, doctor, paciente));
+                } else {
+                    System.out.println("Error: doctor o paciente no encontrado");
+                }
+            }
+            scanner.close();
+        } catch (FileNotFoundException e) {
+            System.out.println("Error al cargar las citas: " + e.getMessage());
+        }
+    }
+
 }
+

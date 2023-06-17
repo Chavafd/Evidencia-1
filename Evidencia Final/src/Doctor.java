@@ -6,7 +6,12 @@ public class Doctor extends Persona {
         this.especialidad = especialidad;
     }
 
-    // getters y setters
+    public String getId() {
+        return this.id;
+    }
+
+    // otros getters y setters
 }
+
 
 

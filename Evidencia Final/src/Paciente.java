@@ -3,6 +3,11 @@ public class Paciente extends Persona {
         super(id, nombreCompleto);
     }
 
-    // getters y setters
+    public String getId() {
+        return this.id;
+    }
+
+    // otros getters y setters
 }
+
 
