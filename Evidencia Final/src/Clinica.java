@@ -3,6 +3,9 @@ import java.util.List;
 import java.util.Scanner;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.io.PrintWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
 
 public class Clinica {
     private static List<Doctor> doctores = new ArrayList<>();
@@ -78,5 +81,92 @@ public class Clinica {
             }
         }
     }
+    public static void guardarDoctores() {
+        try {
+            PrintWriter writer = new PrintWriter(new File("db/doctores.txt"));
+            for (Doctor doctor : doctores) {
+                writer.println(doctor.getId() + "," + doctor.getNombreCompleto() + "," + doctor.getEspecialidad());
+            }
+            writer.close();
+        } catch (FileNotFoundException e) {
+            System.out.println("Error al guardar los doctores: " + e.getMessage());
+        }
+    }
+
+    public static void cargarDoctores() {
+        try {
+            Scanner scanner = new Scanner(new File("db/doctores.txt"));
+            while (scanner.hasNextLine()) {
+                String[] partes = scanner.nextLine().split(",");
+                doctores.add(new Doctor(partes[0], partes[1], partes[2]));
+            }
+            scanner.close();
+        } catch (FileNotFoundException e) {
+            System.out.println("Error al cargar los doctores: " + e.getMessage());
+        }
+    }
+    public static void guardarPacientes() {
+        try {
+            PrintWriter writer = new PrintWriter(new File("db/pacientes.txt"));
+            for (Paciente paciente : pacientes) {
+                writer.println(paciente.getId() + "," + paciente.getNombreCompleto());
+            }
+            writer.close();
+        } catch (FileNotFoundException e) {
+            System.out.println("Error al guardar los pacientes: " + e.getMessage());
+        }
+    }
+
+    public static void cargarPacientes() {
+        try {
+            Scanner scanner = new Scanner(new File("db/pacientes.txt"));
+            while (scanner.hasNextLine()) {
+                String[] partes = scanner.nextLine().split(",");
+                pacientes.add(new Paciente(partes[0], partes[1]));
+            }
+            scanner.close();
+        } catch (FileNotFoundException e) {
+            System.out.println("Error al cargar los pacientes: " + e.getMessage());
+        }
+    }
+
+    public static void guardarCitas() {
+        try {
+            PrintWriter writer = new PrintWriter(new File("db/citas.txt"));
+            for (Cita cita : citas) {
+                writer.println(cita.getId() + "," + cita.getFechaHora() + "," + cita.getMotivo() + "," + cita.getDoctor().getId() + "," + cita.getPaciente().getId());
+            }
+            writer.close();
+        } catch (FileNotFoundException e) {
+            System.out.println("Error al guardar las citas: " + e.getMessage());
+        }
+    }
+
+    public static void cargarCitas() {
+        try {
+            Scanner scanner = new Scanner(new File("db/citas.txt"));
+            while (scanner.hasNextLine()) {
+                String[] partes = scanner.nextLine().split(",");
+                String idCita = partes[0];
+                LocalDateTime fechaHora = LocalDateTime.parse(partes[1], DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+                String motivo = partes[2];
+                String idDoctor = partes[3];
+                String idPaciente = partes[4];
+
+                Doctor doctor = doctores.stream().filter(d -> d.getId().equals(idDoctor)).findFirst().orElse(null);
+                Paciente paciente = pacientes.stream().filter(p -> p.getId().equals(idPaciente)).findFirst().orElse(null);
+
+                if (doctor != null && paciente != null) {
+                    citas.add(new Cita(idCita, fechaHora, motivo, doctor, paciente));
+                } else {
+                    System.out.println("Error: doctor o paciente no encontrado");
+                }
+            }
+            scanner.close();
+        } catch (FileNotFoundException e) {
+            System.out.println("Error al cargar las citas: " + e.getMessage());
+        }
+    }
+
 }
 
